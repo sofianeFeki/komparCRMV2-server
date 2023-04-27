@@ -1,4 +1,6 @@
 const Contract = require('../models/contract');
+const moment = require('moment');
+
 
 
 exports.create = async (req, res) => {
@@ -38,23 +40,23 @@ exports.read = async (req, res) => {
   }
 };
 
-
-
-
   exports.adminRows = async (req, res) => {
-    const { page, pageSize } = req.body.paginationModel;
+    const { page } = req.body.paginationModel;
     const { sortModel } = req.body.sortOptions;
-    console.log(sortModel)
-  
+    const pageSize = 20  
+    console.log(req.body)
+    const quickFilterValue = req.body.quickFilter[0];
+
     try {
       const query = {};
       const projection = {
         contratRef: 1,
-        Énergie: 1,
+        clientRef: 1,
+        energie: 1,
         Fournisseur: 1,
         date_de_la_signature: 1,
         StatutQté: '$quality.qualification',
-        StatutSav: '$sav.qualification',
+        StatutWc: '$wc.qualification',
         Nom_du_partenaire: 1,
         _id: 0,
       };
@@ -66,11 +68,14 @@ exports.read = async (req, res) => {
           .sort(sortModel.map(({ field, sort }) => [field, sort === 'asc' ? 1 : -1]))
           .skip(page * pageSize)
           .limit(pageSize);
-      } else {
+      } 
+      
+      else {
         contracts = await Contract.find(query, projection)
           .skip(page * pageSize)
           .limit(pageSize);
       }
+
   
       const totalContracts = await Contract.countDocuments(query);
   
@@ -92,12 +97,13 @@ exports.read = async (req, res) => {
     try {
       const query = {
         $and: [
-          { reservedBy: { $exists: true } } // Exclude reserved contracts
+          { 'quality.qualification': 'aucun(e)' } // Only show contracts with quality.qualification equal to "aucun(e)"
         ]
       };
       const projection = {
         contratRef: 1,
         clientRef: 1,
+        tel:1,
         Civility: 1,
         reservedBy:1,
         Prénom: 1,
@@ -106,7 +112,7 @@ exports.read = async (req, res) => {
         Fournisseur: 1,
         date_de_la_signature: 1,
         StatutQté: '$quality.qualification',
-        StatutSav: '$sav.qualification',
+        StatutWc: '$wc.qualification',
         Nom_du_partenaire: 1,
         _id: 1,
       };
@@ -123,7 +129,10 @@ exports.read = async (req, res) => {
           .skip(page * pageSize)
           .limit(pageSize);
       }
-    
+
+  
+  
+   
       const totalContracts = await Contract.countDocuments(query);
     
       res.json({
@@ -136,9 +145,102 @@ exports.read = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+  exports.wcRows = async (req, res) => {
+    const quickFilterValue = req.body.quickFilter[0];
+    console.log(quickFilterValue);
+  
+    try {
+      let query = Contract.find();
+  
+      if (quickFilterValue) {
+        query.or([
+          { clientRef: { $eq: quickFilterValue } },
+          { tel: { $eq: quickFilterValue } },
+          { Nom: { $eq: quickFilterValue } },
+        ]);
+      } else {
+        return res.json([]);
+      }
+
+      const projection = {
+        contratRef: 1,
+        clientRef: 1,
+        tel:1,
+        Civility: 1,
+        reservedBy:1,
+        Prénom: 1,
+        Nom: 1,
+        energie: 1,
+        Fournisseur: 1,
+        date_de_la_signature: 1,
+        StatutQté: '$quality.qualification',
+        StatutWc: '$wc.qualification',
+        Nom_du_partenaire: 1,
+        _id: 1,
+      };
+  
+      const contracts = await Contract.find(query, projection).exec();
+  
+      // Close the database connection and return the filtered data in the response
+      res.json(contracts);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Internal server error');
+    }
+  };
   
   
+
+  exports.savRows = async (req, res) => {
+
+    const quickFilterValue = req.body.quickFilter[0];
+
+    try {
+      let query = Contract.find();
   
+      if (quickFilterValue) {
+        query.or([
+          { clientRef: { $eq: quickFilterValue } },
+          { tel: { $eq: quickFilterValue } },
+          { Nom: { $eq: quickFilterValue } },
+        ]);
+      } else {
+        query.where('sav.qualification').in([null, 'aucun(e)']);
+        query.or([
+          { 'quality.qualification': 'SAV' },
+          { 'wc.qualification': 'SAV' },
+        ]);
+      }
+      const projection = {
+        contratRef: 1,
+        clientRef: 1,
+        tel:1,
+        Civility: 1,
+        reservedBy:1,
+        Prénom: 1,
+        Nom: 1,
+        energie: 1,
+        Fournisseur: 1,
+        date_de_la_signature: 1,
+        StatutQté: '$quality.qualification',
+        StatutWc: '$wc.qualification',
+        Nom_du_partenaire: 1,
+        _id: 1,
+      };
+  
+      const contracts = await Contract.find(query, projection).exec();
+
+      res.json(contracts);
+      console.log(contracts);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+
+  };
+  
+   
   exports.reservation = async (req, res) => {
     try {
       const contract = await Contract.findById(req.params.id);
@@ -164,54 +266,222 @@ exports.read = async (req, res) => {
     }
   }
 
-  // exports.filters = async (req, res) => {
-  //   const { serverFilters } = req.body;
-  //   const { page, pageSize } = req.query;
-  //   console.log(serverFilters.date)
-  
-  //   try {
-  //     const query = {};
-  
-  //     if (serverFilters.partenaire) {
-  //       query.Nom_du_partenaire = serverFilters.partenaire;
-  //     }
-  
-  //     if (serverFilters.qualificationQté) {
-  //       query['quality.qualification'] = serverFilters.qualificationQté;
-  //     }
-  
-  //     if (serverFilters.qualificationWc) {
-  //       query['wc.qualification'] = serverFilters.qualificationWc;
-  //     }
-  
-  //     if (serverFilters.fournisseur) {
-  //       query.Fournisseur = serverFilters.fournisseur;
-  //     }
-  
-  //     if (serverFilters.date && serverFilters.date.length > 0) {
-  //       const { startDate, endDate } = serverFilters.date[0];
+  exports.filters = async (req, res) => {
+   
+   
+    const {serverFilters} = req.body
+     console.log(req.body);
+    // const { page } = paginationModel;
+    const pageSize = 20  
+    const page = 0 
+    try {
+      const query = {};
 
-  //       if (endDate) {
-  //       query.date_de_la_signature = {
-  //         $gte: new Date(startDate),
-  //         $lte: new Date(endDate),
-  //       };
-  //     }
-  //     }
+      const projection = {
+        contratRef: 1,
+        clientRef: 1,
+        tel:1,
+        Civility: 1,
+        reservedBy:1,
+        Prénom: 1,
+        Nom: 1,
+        energie: 1,
+        Fournisseur: 1,
+        date_de_la_signature: 1,
+        StatutQté: '$quality.qualification',
+        StatutWc: '$wc.qualification',
+        Nom_du_partenaire: 1,
+        _id: 1,
+      };
   
-  //     const contracts = await Contract.find(query)
-  //       .skip(page * pageSize)
-  //       .limit(pageSize);
+      if (serverFilters.partenaire) {
+        query.Nom_du_partenaire = serverFilters.partenaire;
+      }
   
-  //     const totalContracts = await Contract.countDocuments(query);
+      if (serverFilters.qualificationQté) {
+        query['quality.qualification'] = serverFilters.qualificationQté;
+      }
   
-  //     res.json({
-  //       data: contracts,
-  //       page: page,
-  //       total: totalContracts,
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // };
+      if (serverFilters.qualificationWc) {
+        query['wc.qualification'] = serverFilters.qualificationWc;
+      }
+  
+      if (serverFilters.fournisseur) {
+        query.Fournisseur = serverFilters.fournisseur;
+      }
+  
+      if (serverFilters.date && serverFilters.date.length > 0) {
+        const { startDate, endDate } = serverFilters.date[0];
+        const startOfDay = moment(startDate)
+        .startOf('day')
+        .toISOString();
+      const endOfDay = moment(endDate).endOf('day').toISOString()
+
+        if (endDate) {
+        query.date_de_la_signature = {
+          $gte: new Date(startOfDay),
+          $lte: new Date(endOfDay),
+        };
+      }
+      }
+  
+      const contracts = await Contract.find(query, projection)
+  
+      const totalContracts = await Contract.countDocuments(query);
+  
+      res.json({
+        data: contracts,
+        total: totalContracts,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+  exports.quickFilter = async (req, res) => {
+    const quickFilterValue = req.body.quickFilter[0];
+    console.log(quickFilterValue)
+    try {
+      const query = {
+        $or: [
+          { clientRef: { $eq: quickFilterValue } },
+          { tel: { $eq: quickFilterValue } },
+          { Nom: { $eq: quickFilterValue } },
+        ],
+      };
+      const contracts = await Contract.find(query).exec();
+  
+      res.json(contracts);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "aaaaaaa" });
+    }
+  };
+  exports.updateQuality = async (req, res) => {
+  
+  try {
+    const { slug, energie } = req.params;
+
+    const clientRef = slug
+
+
+    const updatedDocument = await Contract.findOneAndUpdate(
+      { clientRef, energie },
+      {
+        $set: {
+          'quality.values': req.body.switchState,
+          'quality.qualification': req.body.qualification,
+          'quality.comment': req.body.comment,
+        },
+      },
+      { new: true }
+    ).exec();
+
+    //console.log('---------> i m the update', updatedDocument);
+    res.json(updatedDocument);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateSav = async (req, res) => {
+
+  //console.log('---------> i m the req', req.body);
+  const { slug, energie } = req.params;
+
+ const clientRef = slug
+
+
+  try {
+    const updatedDocument = await Contract.findOneAndUpdate(
+      { clientRef, energie},
+      
+      {
+        $set: {
+          'sav.qualification': req.body.qualification,
+          'sav.comment': req.body.comment,
+        },
+      },
+      { new: true }
+    ).exec();
+
+    //console.log('---------> i m the update', updatedDocument);
+    res.json(updatedDocument);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateWc = async (req, res) => {
+  const { slug, energie } = req.params;
+
+ const clientRef = slug
+  try {
+    const updatedDocument = await Contract.findOneAndUpdate(
+      { clientRef, energie},
+      {
+        $set: {
+          'wc.subQualification': req.body.AnnuleRaison,
+          'wc.qualification': req.body.qualification,
+          'wc.comment': req.body.comment,
+        },
+      },
+      { new: true }
+    ).exec();
+
+    console.log('---------> i m the update', updatedDocument);
+    res.json(updatedDocument);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.exportData = async (req, res) => {
+   const {filters} = req.body
+  console.log(filters.date);
+
+  try {
+     let query = {};
+    if (filters.date && filters.date.endDate !== null) {
+      query.date_de_la_signature = {};
+      if (filters.date.startDate) {
+        query.date_de_la_signature.$gte = moment(filters.date.startDate)
+          .startOf('day')
+          .toDate();
+      }
+      if (filters.date.endDate) {
+        query.date_de_la_signature.$lte = moment(filters.date.endDate)
+          .endOf('day')
+          .toDate();
+      }
+    }
+    if (filters.qualificationqté) {
+      query['quality.qualification'] = filters.qualificationqté;
+    }
+
+    if (filters.qualificationwc) {
+      query['wc.qualification'] = filters.qualificationwc;
+    }
+
+    if (filters.partenaire) {
+      query.Nom_du_partenaire = filters.partenaire;
+    }
+
+    let contracts;
+
+    if (Object.keys(query).length === 0) {
+      contracts = await Contract.find({});
+    } else {
+      contracts = await Contract.find(query);
+     // console.log('querry ------->', query);
+    }
+
+    res.json(contracts);
+  } catch (err) {
+    console.log(err);
+  }
+};
