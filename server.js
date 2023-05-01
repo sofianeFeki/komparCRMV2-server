@@ -1,33 +1,33 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const { readdirSync } = require('fs');
-require('dotenv').config();
 
-//app
-const app = express();
+const router = express.Router();
+const { authCheck, adminCheck } = require('../middlewares/auth');
 
-//db
-mongoose.set('strictQuery', false);
-mongoose
-  .connect('mongodb+srv://sofiene:20224267aa@komparcrm.bncygkp.mongodb.net/test', {
-    useNewUrlParser: true,
-  })
-  .then(() => console.log('db-connected'))
-  .catch((err) => console.log('db-connection-error', err));
+const {
+  create, read, adminRows,filters, qtéRows, reservation, quickFilter, updateQuality, updateSav, updateWc, savRows, wcRows, exportData
 
-//middlewares
+} = require('../controllers/contract');
 
-app.use(morgan('dev'));
-app.use(bodyParser.json({ limit: '2mb' }));
-app.use(cors());
+router.post('/contract', authCheck, adminCheck, create);
+router.post('/admin-contracts', adminRows);
+router.post('/qty-contracts', qtéRows);
+router.post('/sav-contracts', savRows);
+router.post('/wc-contracts', wcRows);
+router.get('/contract/:clientRef/:energie', read);
 
-//route middleware
-readdirSync('./routes').map((r) => app.use('/api', require('./routes/' + r)));
+router.post('/Filters', filters);
+router.post('/quickFilters', quickFilter);
+router.post('/:id/reserve', reservation);
 
-//port
-const port = process.env.PORT || 8000;
+router.post('/contracts/export', exportData);
 
-app.listen(port, () => console.log(`server is running on port ${port}`));
+
+router.put('/contract/update/quality/:slug/:energie', authCheck, updateQuality);
+ router.put('/contract/update/sav/:slug/:energie', authCheck, updateSav);
+router.put('/contract/update/wc/:slug/:energie', authCheck, updateWc);
+
+
+
+
+
+module.exports = router;
