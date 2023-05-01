@@ -42,9 +42,9 @@ exports.read = async (req, res) => {
 
   exports.adminRows = async (req, res) => {
     const { page } = req.body.paginationModel;
-    const { sortModel } = req.body.sortOptions;
+    const {  sortOptions } = req.body;
     const pageSize = 20  
-    console.log(req.body)
+    console.log(req.body.quickFilter)
     const quickFilterValue = req.body.quickFilter[0];
 
     try {
@@ -53,6 +53,7 @@ exports.read = async (req, res) => {
         contratRef: 1,
         clientRef: 1,
         energie: 1,
+        Nom: 1,
         Fournisseur: 1,
         date_de_la_signature: 1,
         StatutQté: '$quality.qualification',
@@ -60,12 +61,18 @@ exports.read = async (req, res) => {
         Nom_du_partenaire: 1,
         _id: 0,
       };
-  
+     if (quickFilterValue) {
+      query["$or"] = [
+        { clientRef: { $eq: quickFilterValue } },
+        { tel: { $eq: quickFilterValue } },
+        { Nom: { $eq: quickFilterValue } },
+      ];
+    }
       let contracts;
   
-      if (sortModel && sortModel.length > 0) {
+      if (sortOptions && sortOptions.length > 0) {
         contracts = await Contract.find(query, projection)
-          .sort(sortModel.map(({ field, sort }) => [field, sort === 'asc' ? 1 : -1]))
+          .sort(sortOptions.map(({ field, sort }) => [field, sort === 'asc' ? 1 : -1]))
           .skip(page * pageSize)
           .limit(pageSize);
       } 
@@ -91,8 +98,11 @@ exports.read = async (req, res) => {
   };
 
   exports.qtéRows = async (req, res) => {
-    const { page, pageSize } = req.body.paginationModel;
-    const { sortModel } = req.body.sortOptions;
+    const { page } = req.body.paginationModel;
+    const {  sortOptions } = req.body;
+    const pageSize = 20  
+    console.log(req.body.quickFilter)
+    const quickFilterValue = req.body.quickFilter[0];
     
     try {
       const query = {
@@ -116,15 +126,23 @@ exports.read = async (req, res) => {
         Nom_du_partenaire: 1,
         _id: 1,
       };
+
+      if (quickFilterValue) {
+        query["$or"] = [
+          { clientRef: { $eq: quickFilterValue } },
+          { tel: { $eq: quickFilterValue } },
+          { Nom: { $eq: quickFilterValue } },
+        ];
+      }
     
       let contracts;
     
-      if (sortModel && sortModel.length > 0) {
+      if (sortOptions && sortOptions.length > 0) {
         contracts = await Contract.find(query, projection)
-          .sort(sortModel.map(({ field, sort }) => [field, sort === 'asc' ? 1 : -1]))
+          .sort(sortOptions.map(({ field, sort }) => [field, sort === 'asc' ? 1 : -1]))
           .skip(page * pageSize)
           .limit(pageSize);
-      } else {
+      }  else {
         contracts = await Contract.find(query, projection)
           .skip(page * pageSize)
           .limit(pageSize);
@@ -166,7 +184,7 @@ exports.read = async (req, res) => {
       const projection = {
         contratRef: 1,
         clientRef: 1,
-        tel:1,
+        Tél:1,
         Civility: 1,
         reservedBy:1,
         Prénom: 1,
@@ -260,84 +278,93 @@ exports.read = async (req, res) => {
       await contract.save();
   
       return res.send({ message: 'Contract reserved successfully' });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send({ error: 'Server error' });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
     }
   }
 
-  exports.filters = async (req, res) => {
-   
-   
-    const {serverFilters} = req.body
-     console.log(req.body);
-    // const { page } = paginationModel;
-    const pageSize = 20  
-    const page = 0 
-    try {
-      const query = {};
+exports.filters = async (req, res) => {
+  const { serverFilters, paginationModel, sortOptions } = req.body;
+  const { page, pageSize } = paginationModel;
 
-      const projection = {
-        contratRef: 1,
-        clientRef: 1,
-        tel:1,
-        Civility: 1,
-        reservedBy:1,
-        Prénom: 1,
-        Nom: 1,
-        energie: 1,
-        Fournisseur: 1,
-        date_de_la_signature: 1,
-        StatutQté: '$quality.qualification',
-        StatutWc: '$wc.qualification',
-        Nom_du_partenaire: 1,
-        _id: 1,
-      };
-  
-      if (serverFilters.partenaire) {
-        query.Nom_du_partenaire = serverFilters.partenaire;
-      }
-  
-      if (serverFilters.qualificationQté) {
-        query['quality.qualification'] = serverFilters.qualificationQté;
-      }
-  
-      if (serverFilters.qualificationWc) {
-        query['wc.qualification'] = serverFilters.qualificationWc;
-      }
-  
-      if (serverFilters.fournisseur) {
-        query.Fournisseur = serverFilters.fournisseur;
-      }
-  
-      if (serverFilters.date && serverFilters.date.length > 0) {
-        const { startDate, endDate } = serverFilters.date[0];
-        const startOfDay = moment(startDate)
+  try {
+    const query = {};
+
+    const projection = {
+      contratRef: 1,
+      clientRef: 1,
+      tel: 1,
+      Civility: 1,
+      reservedBy: 1,
+      Prénom: 1,
+      Nom: 1,
+      energie: 1,
+      Fournisseur: 1,
+      date_de_la_signature: 1,
+      StatutQté: '$quality.qualification',
+      StatutWc: '$wc.qualification',
+      Nom_du_partenaire: 1,
+      _id: 1,
+    };
+
+    if (serverFilters.partenaire) {
+      query.Nom_du_partenaire = serverFilters.partenaire;
+    }
+
+    if (serverFilters.qualificationQté) {
+      query['quality.qualification'] = serverFilters.qualificationQté;
+    }
+
+    if (serverFilters.qualificationWc) {
+      query['wc.qualification'] = serverFilters.qualificationWc;
+    }
+
+    if (serverFilters.fournisseur) {
+      query.Fournisseur = serverFilters.fournisseur;
+    }
+
+    if (serverFilters.date && serverFilters.date.length > 0) {
+      const { startDate, endDate } = serverFilters.date[0];
+      const startOfDay = moment(startDate)
         .startOf('day')
         .toISOString();
-      const endOfDay = moment(endDate).endOf('day').toISOString()
+      const endOfDay = moment(endDate)
+        .endOf('day')
+        .toISOString();
 
-        if (endDate) {
+      if (endDate) {
         query.date_de_la_signature = {
           $gte: new Date(startOfDay),
           $lte: new Date(endOfDay),
         };
       }
-      }
-  
-      const contracts = await Contract.find(query, projection)
-  
-      const totalContracts = await Contract.countDocuments(query);
-  
-      res.json({
-        data: contracts,
-        total: totalContracts,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: error.message });
     }
-  };
+
+    let contracts = [];
+    const totalContracts = await Contract.countDocuments(query);
+
+    if (sortOptions && sortOptions.length > 0) {
+      contracts = await Contract.find(query, projection)
+        .sort(sortOptions.map(({ field, sort }) => [field, sort === 'asc' ? 1 : -1]))
+        .skip(page * pageSize)
+        .limit(pageSize);
+    } else {
+      contracts = await Contract.find(query, projection)
+        .skip(page * pageSize)
+        .limit(pageSize);
+    }
+
+    res.json({
+      data: contracts,
+      total: totalContracts,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
   exports.quickFilter = async (req, res) => {
     const quickFilterValue = req.body.quickFilter[0];
@@ -442,23 +469,25 @@ exports.updateWc = async (req, res) => {
 
 exports.exportData = async (req, res) => {
    const {filters} = req.body
-  console.log(filters.date);
+   const date = filters.date && filters.date.length > 0 ? filters.date[0] : null;
+   console.log(date);
 
   try {
      let query = {};
-    if (filters.date && filters.date.endDate !== null) {
+     if (date && date.endDate !== null) {
       query.date_de_la_signature = {};
-      if (filters.date.startDate) {
-        query.date_de_la_signature.$gte = moment(filters.date.startDate)
+      if (date.startDate) {
+        query.date_de_la_signature.$gte = moment(date.startDate)
           .startOf('day')
           .toDate();
       }
-      if (filters.date.endDate) {
-        query.date_de_la_signature.$lte = moment(filters.date.endDate)
-          .endOf('day')
+      if (date.endDate) {
+        query.date_de_la_signature.$lte = moment(date.endDate)
+          .endOf('day') // use end of endDate instead of end of day
           .toDate();
       }
     }
+    
     if (filters.qualificationqté) {
       query['quality.qualification'] = filters.qualificationqté;
     }
