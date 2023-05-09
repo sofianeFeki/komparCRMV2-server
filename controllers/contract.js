@@ -284,47 +284,47 @@ exports.read = async (req, res) => {
     }
   }
 
-exports.filters = async (req, res) => {
-  const { serverFilters, paginationModel, sortOptions } = req.body;
-  const { page, pageSize } = paginationModel;
+ exports.filters = async (req, res) => {
+    const { serverFilters, paginationModel, sortOptions } = req.body;
+    const { page, pageSize } = paginationModel;
 
-  try {
-    const query = {};
+    try {
+      const query = {};
 
-    const projection = {
-      contratRef: 1,
-      clientRef: 1,
-      tel: 1,
-      Civility: 1,
-      reservedBy: 1,
-      Prénom: 1,
-      Nom: 1,
-      energie: 1,
-      Fournisseur: 1,
-      date_de_la_signature: 1,
-      StatutQté: '$quality.qualification',
-      StatutWc: '$wc.qualification',
-      Nom_du_partenaire: 1,
-      _id: 1,
-    };
+      const projection = {
+        contratRef: 1,
+        clientRef: 1,
+        tel: 1,
+        Civility: 1,
+        reservedBy: 1,
+        Prénom: 1,
+        Nom: 1,
+        energie: 1,
+        Fournisseur: 1,
+        date_de_la_signature: 1,
+        StatutQté: '$quality.qualification',
+        StatutWc: '$wc.qualification',
+        Nom_du_partenaire: 1,
+        _id: 1,
+      };
 
-    if (serverFilters.partenaire) {
-      query.Nom_du_partenaire = serverFilters.partenaire;
-    }
+      if (serverFilters.partenaire) {
+        query.Nom_du_partenaire = serverFilters.partenaire;
+      }
 
-    if (serverFilters.qualificationQté) {
-      query['quality.qualification'] = serverFilters.qualificationQté;
-    }
+      if (serverFilters.qualificationQté) {
+        query['quality.qualification'] = serverFilters.qualificationQté;
+      }
 
-    if (serverFilters.qualificationWc) {
-      query['wc.qualification'] = serverFilters.qualificationWc;
-    }
+      if (serverFilters.qualificationWc) {
+        query['wc.qualification'] = serverFilters.qualificationWc;
+      }
 
-    if (serverFilters.fournisseur) {
-      query.Fournisseur = serverFilters.fournisseur;
-    }
+      if (serverFilters.fournisseur) {
+        query.Fournisseur = serverFilters.fournisseur;
+      }
 
-if (serverFilters.date && serverFilters.date.length > 0) {
+      if (serverFilters.date && serverFilters.date.length > 0) {
         const { startDate, endDate } = serverFilters.date[0];
         const startOfDay = moment(startDate)
           .startOf('day')
@@ -341,29 +341,29 @@ if (serverFilters.date && serverFilters.date.length > 0) {
         }
       }
 
-    let contracts = [];
-    const totalContracts = await Contract.countDocuments(query);
+      let contracts = [];
+      const totalContracts = await Contract.countDocuments(query);
 
-    if (sortOptions && sortOptions.length > 0) {
-      contracts = await Contract.find(query, projection)
-        .sort(sortOptions.map(({ field, sort }) => [field, sort === 'asc' ? 1 : -1]))
-        .skip(page * pageSize)
-        .limit(pageSize);
-    } else {
-      contracts = await Contract.find(query, projection)
-        .skip(page * pageSize)
-        .limit(pageSize);
+      if (sortOptions && sortOptions.length > 0) {
+        contracts = await Contract.find(query, projection)
+          .sort(sortOptions.map(({ field, sort }) => [field, sort === 'asc' ? 1 : -1]))
+          .skip(page * pageSize)
+          .limit(pageSize);
+      } else {
+        contracts = await Contract.find(query, projection)
+          .skip(page * pageSize)
+          .limit(pageSize);
+      }
+
+      res.json({
+        data: contracts,
+        total: totalContracts,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
     }
-
-    res.json({
-      data: contracts,
-      total: totalContracts,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error.message });
-  }
-};
+  };
 
 
   exports.quickFilter = async (req, res) => {
