@@ -324,22 +324,22 @@ exports.filters = async (req, res) => {
       query.Fournisseur = serverFilters.fournisseur;
     }
 
-    if (serverFilters.date && serverFilters.date.length > 0) {
-      const { startDate, endDate } = serverFilters.date[0];
-      const startOfDay = moment(startDate)
-        .startOf('day')
-        .toISOString();
-      const endOfDay = moment(endDate)
-        .endOf('day')
-        .toISOString();
+if (serverFilters.date && serverFilters.date.length > 0) {
+        const { startDate, endDate } = serverFilters.date[0];
+        const startOfDay = moment(startDate)
+          .startOf('day')
+          .toISOString();
+        const endOfDay = moment(endDate)
+          .endOf('day')
+          .toISOString();
 
-      if (endDate) {
-        query.date_de_la_signature = {
-          $gte: new Date(startOfDay),
-          $lte: new Date(endOfDay),
-        };
+        if (endDate) {
+          query.date_de_la_signature = {
+            $gte: new Date(startOfDay),
+            $lte: new Date(endOfDay),
+          };
+        }
       }
-    }
 
     let contracts = [];
     const totalContracts = await Contract.countDocuments(query);
