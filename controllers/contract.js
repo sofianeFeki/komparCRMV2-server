@@ -54,6 +54,7 @@ exports.read = async (req, res) => {
         clientRef: 1,
         energie: 1,
         Nom: 1,
+        Tél: 1,
         Fournisseur: 1,
         date_de_la_signature: 1,
         StatutQté: '$quality.qualification',
