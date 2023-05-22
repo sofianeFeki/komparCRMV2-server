@@ -377,18 +377,6 @@ exports.read = async (req, res) => {
       }
     }
 
-  exports.filters = async (req, res) => {
-    const { serverFilters, paginationModel, sortOptions } = req.body;
-    const { page, pageSize } = paginationModel;
-    console.log(serverFilters.date)
-
-    try {
-      const query = {};
-
-      const projection = {
-        contratRef: 1,
-        clientRef: 1,
-        tel: 1,
   exports.qtéRows = async (req, res) => {
     const { page } = req.body.paginationModel;
     const {  sortOptions } = req.body;
