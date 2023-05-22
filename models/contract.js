@@ -42,11 +42,11 @@ const contractSchema = mongoose.Schema(
       maxlenght: 32,
       text: true,
     },
-    tel: {
+    Tél: {
       type: String,
       index: true,
     },
-    email: {
+    Email: {
       type: String,
       trim: true,
       maxlenght: 32,
@@ -198,14 +198,7 @@ const contractSchema = mongoose.Schema(
       },
       subQualification: {
         type: String,
-        enum: [
-          ' Iban_frauduleux',
-          ' STOP_Télémarketing',
-          'Hors_cible',
-          'forcing',
-          'Déménagement',
-          'Contrat_en_double',
-        ],
+      
       },
       comment: { type: String, default: '' },
       
