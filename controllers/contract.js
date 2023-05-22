@@ -64,7 +64,7 @@ exports.read = async (req, res) => {
      if (quickFilterValue) {
       query["$or"] = [
         { clientRef: { $eq: quickFilterValue } },
-        { tel: { $eq: quickFilterValue } },
+        { Tél: { $eq: quickFilterValue } },
         { Nom: { $eq: quickFilterValue } },
       ];
     }
@@ -112,7 +112,7 @@ exports.read = async (req, res) => {
       const projection = {
         contratRef: 1,
         clientRef: 1,
-        tel:1,
+        Tél:1,
         Civility: 1,
         reservedBy: 1,
         Prénom: 1,
@@ -129,7 +129,7 @@ exports.read = async (req, res) => {
       if (quickFilterValue) {
         query["$or"] = [
           { clientRef: { $eq: quickFilterValue } },
-          { tel: { $eq: quickFilterValue } },
+          { Tél: { $eq: quickFilterValue } },
           { Nom: { $eq: quickFilterValue } },
         ];
       }
@@ -172,7 +172,7 @@ exports.read = async (req, res) => {
       if (quickFilterValue) {
         query.or([
           { clientRef: { $eq: quickFilterValue } },
-          { tel: { $eq: quickFilterValue } },
+          { Tél: { $eq: quickFilterValue } },
           { Nom: { $eq: quickFilterValue } },
         ]);
       } else {
@@ -218,7 +218,7 @@ exports.read = async (req, res) => {
       if (quickFilterValue) {
         query.or([
           { clientRef: { $eq: quickFilterValue } },
-          { tel: { $eq: quickFilterValue } },
+          { Tél: { $eq: quickFilterValue } },
           { Nom: { $eq: quickFilterValue } },
         ]);
       } else {
@@ -231,7 +231,7 @@ exports.read = async (req, res) => {
       const projection = {
         contratRef: 1,
         clientRef: 1,
-        tel:1,
+        Tél:1,
         Civility: 1,
         reservedBy:1,
         Prénom: 1,
@@ -292,7 +292,7 @@ exports.read = async (req, res) => {
       const projection = {
         contratRef: 1,
         clientRef: 1,
-        tel: 1,
+        Tél: 1,
         Civility: 1,
         reservedBy: 1,
         Prénom: 1,
@@ -371,7 +371,7 @@ exports.read = async (req, res) => {
       const query = {
         $or: [
           { clientRef: { $eq: quickFilterValue } },
-          { tel: { $eq: quickFilterValue } },
+          { Tél: { $eq: quickFilterValue } },
           { Nom: { $eq: quickFilterValue } },
         ],
       };
