@@ -25,10 +25,6 @@ router.post('/contracts/export', exportData);
 router.put('/contract/update/quality/:slug/:energie', authCheck, updateQuality);
  router.put('/contract/update/sav/:slug/:energie', authCheck, updateSav);
 router.put('/contract/update/wc/:slug/:energie', authCheck, updateWc);
-<<<<<<< HEAD
-
-=======
->>>>>>> e9e80f8e817dcb63fa9ecc785aa7b798e8899fb6
 
 
 
