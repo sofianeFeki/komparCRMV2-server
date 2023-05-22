@@ -259,7 +259,7 @@ exports.read = async (req, res) => {
    
   exports.reservation = async (req, res) => {
     try {
-      const { slug, energie } = req.params;
+        const contract = await Contract.findById(req.params.id);
 
       
   
