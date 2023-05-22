@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
   const Contract = require('../models/contract');
   const moment = require('moment');
 
@@ -12,7 +12,6 @@
       const newContract = await Contract.insertMany(req.body);
       //console.log(res);
       res.json(newContract);
-=======
 const Contract = require('../models/contract');
 const moment = require('moment');
 
@@ -106,13 +105,11 @@ exports.read = async (req, res) => {
         page: page,
         total: totalContracts
       });
->>>>>>> e9e80f8e817dcb63fa9ecc785aa7b798e8899fb6
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
   };
 
-<<<<<<< HEAD
   exports.read = async (req, res) => {
     try {
       const { clientRef, energie } = req.params;
@@ -392,7 +389,6 @@ exports.read = async (req, res) => {
         contratRef: 1,
         clientRef: 1,
         tel: 1,
-=======
   exports.qtéRows = async (req, res) => {
     const { page } = req.body.paginationModel;
     const {  sortOptions } = req.body;
@@ -410,7 +406,6 @@ exports.read = async (req, res) => {
         contratRef: 1,
         clientRef: 1,
         tel:1,
->>>>>>> e9e80f8e817dcb63fa9ecc785aa7b798e8899fb6
         Civility: 1,
         reservedBy: 1,
         Prénom: 1,
@@ -424,7 +419,6 @@ exports.read = async (req, res) => {
         _id: 1,
       };
 
-<<<<<<< HEAD
       if (serverFilters.partenaire) {
         query.Nom_du_partenaire = serverFilters.partenaire;
       }
@@ -461,7 +455,6 @@ exports.read = async (req, res) => {
       let contracts = [];
       const totalContracts = await Contract.countDocuments(query);
 
-=======
       if (quickFilterValue) {
         query["$or"] = [
           { clientRef: { $eq: quickFilterValue } },
@@ -472,7 +465,6 @@ exports.read = async (req, res) => {
     
       let contracts;
     
->>>>>>> e9e80f8e817dcb63fa9ecc785aa7b798e8899fb6
       if (sortOptions && sortOptions.length > 0) {
         contracts = await Contract.find(query, projection)
           .sort(sortOptions.map(({ field, sort }) => [field, sort === 'asc' ? 1 : -1]))
@@ -484,14 +476,12 @@ exports.read = async (req, res) => {
           .limit(pageSize);
       }
 
-<<<<<<< HEAD
-=======
+
   
   
    
       const totalContracts = await Contract.countDocuments(query);
     
->>>>>>> e9e80f8e817dcb63fa9ecc785aa7b798e8899fb6
       res.json({
         data: contracts,
         total: totalContracts,
@@ -502,7 +492,6 @@ exports.read = async (req, res) => {
     }
   };
 
-<<<<<<< HEAD
 
     exports.quickFilter = async (req, res) => {
       const quickFilterValue = req.body.quickFilter[0];
@@ -525,7 +514,6 @@ exports.read = async (req, res) => {
     };
     exports.updateQuality = async (req, res) => {
     
-=======
   exports.wcRows = async (req, res) => {
     const quickFilterValue = req.body.quickFilter[0];
     console.log(quickFilterValue);
@@ -622,11 +610,9 @@ exports.read = async (req, res) => {
   
    
   exports.reservation = async (req, res) => {
->>>>>>> e9e80f8e817dcb63fa9ecc785aa7b798e8899fb6
     try {
       const { slug, energie } = req.params;
 
-<<<<<<< HEAD
       const clientRef = slug
 
 
@@ -646,7 +632,6 @@ exports.read = async (req, res) => {
       res.json(updatedDocument);
     } catch (error) {
       console.error(error);
-=======
       
   
       if (!contract) {
@@ -664,12 +649,10 @@ exports.read = async (req, res) => {
       return res.send({ message: 'Contract reserved successfully' });
     } catch (error) {
       console.log(error);
->>>>>>> e9e80f8e817dcb63fa9ecc785aa7b798e8899fb6
       res.status(500).json({ error: error.message });
     }
   };
 
-<<<<<<< HEAD
   exports.updateSav = async (req, res) => {
 
     //console.log('---------> i m the req', req.body);
@@ -770,7 +753,6 @@ exports.read = async (req, res) => {
       console.log(err);
     }
   };
-=======
  exports.filters = async (req, res) => {
     const { serverFilters, paginationModel, sortOptions } = req.body;
     const { page, pageSize } = paginationModel;
@@ -1001,4 +983,3 @@ exports.exportData = async (req, res) => {
     console.log(err);
   }
 };
->>>>>>> e9e80f8e817dcb63fa9ecc785aa7b798e8899fb6
