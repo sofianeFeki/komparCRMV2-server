@@ -97,6 +97,10 @@ const contractSchema = mongoose.Schema(
         type: String,
       },
 
+      Type_de_contrat: {
+      type: String,
+    },
+
     reservedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
