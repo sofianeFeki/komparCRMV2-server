@@ -4,7 +4,7 @@ const router = express.Router();
 const { authCheck, adminCheck } = require('../middlewares/auth');
 
 const {
-  create, read, adminRows,filters, qtéRows, reservation, quickFilter, updateQuality, updateSav, updateWc, savRows, wcRows, exportData
+  create, read, adminRows,filters, qtéRows, reservation, quickFilter, updateQuality, updateSav, updateWc, savRows, wcRows, exportData, update,
 
 } = require('../controllers/contract');
 
