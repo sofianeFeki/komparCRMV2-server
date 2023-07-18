@@ -25,6 +25,8 @@ router.post('/contracts/export', exportData);
 router.put('/contract/update/quality/:slug/:energie', updateQuality);
  router.put('/contract/update/sav/:slug/:energie',  updateSav);
 router.put('/contract/update/wc/:slug/:energie',  updateWc);
+router.put("/contract/update/:slug/:energie", adminCheck, update);
+
 
 
 
