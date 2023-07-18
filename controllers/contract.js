@@ -457,6 +457,26 @@ exports.updateWc = async (req, res) => {
   }
 };
 
+exports.update = async (req, res) => {
+  const { slug, energie } = req.params;
+
+  const clientRef = slug;
+  try {
+    const updatedDocument = await Contract.findOneAndUpdate(
+      { clientRef, energie },
+      req.body,
+      { new: true }
+    ).exec();
+
+    console.log("---------> i m the update", updatedDocument);
+    res.json(updatedDocument);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 exports.exportData = async (req, res) => {
   const { filters } = req.body;
   const date = filters.date && filters.date.length > 0 ? filters.date[0] : null;
