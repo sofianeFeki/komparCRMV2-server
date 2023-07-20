@@ -213,6 +213,9 @@ exports.wcRows = async (req, res) => {
 
 exports.savRows = async (req, res) => {
   const quickFilterValue = req.body.quickFilter[0];
+  const { page } = req.body.paginationModel;
+  const { sortOptions } = req.body;
+  const pageSize = 20;
 
   try {
     let query = Contract.find();
@@ -224,7 +227,7 @@ exports.savRows = async (req, res) => {
         { Nom: { $eq: quickFilterValue } },
       ]);
     } else {
-      query.where("sav.qualification").in([null, "aucun(e)"]);
+      query.where("sav.qualification").in([null, "aucun(e)", "A relancer"]);
       query.or([
         { "quality.qualification": "SAV" },
         { "wc.qualification": "SAV" },
@@ -248,15 +251,27 @@ exports.savRows = async (req, res) => {
       _id: 1,
     };
 
-    const contracts = await Contract.find(query, projection).exec();
+    const contracts = await Contract.find(query, projection)
+      .sort(
+        sortOptions.map(({ field, sort }) => [field, sort === "asc" ? 1 : -1])
+      )
+      .skip(page * pageSize)
+      .limit(pageSize)
+      .exec();
 
-    res.json(contracts);
+    const totalContracts = await Contract.countDocuments(query);
+
+    res.json({
+      data: contracts,
+      total: totalContracts,
+    });
     console.log(contracts);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 exports.reservation = async (req, res) => {
   try {
