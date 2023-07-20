@@ -172,7 +172,7 @@ const contractSchema = mongoose.Schema(
       },
       qualification: {
         type: String,
-        enum: ['conforme', 'non-conforme', 'sav', 'annulation', 'aucun(e)'],
+        enum: ['conforme', 'non-conforme', 'sav', 'annulation', 'aucun(e)',   "pas d'enregistrement",],
         default: 'aucun(e)',
       },
       comment: { type: String, default: '' },
