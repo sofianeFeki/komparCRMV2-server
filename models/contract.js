@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const slug = require('mongoose-slug-generator');
+const mongoose = require("mongoose");
+const slug = require("mongoose-slug-generator");
 
 mongoose.plugin(slug);
 
@@ -12,10 +12,7 @@ const contractSchema = mongoose.Schema(
       text: true,
     },
     slug: {
-      slug: { type: String, slug: ['clientRef', 'energie'] ,separator: '/',
-    }
-      
-
+      slug: { type: String, slug: ["clientRef", "energie"], separator: "/" },
     },
     clientRef: {
       type: String,
@@ -94,23 +91,32 @@ const contractSchema = mongoose.Schema(
     },
 
     Fournisseur: {
-        type: String,
-      },
-
-      Type_de_contrat: {
       type: String,
     },
 
+    Type_de_contrat: {
+      type: String,
+    },
+    Mode_facturation: {
+      type: String,
+    },
+    Option_tarifaire: {
+      type: String,
+    },
+    Date_naissance: {
+      type: Date,
+    },
+
     reservedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: null
-      },
-  
-      reservedAt: {
-        type: Date,
-        default: null
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
+    reservedAt: {
+      type: Date,
+      default: null,
+    },
     quality: {
       values: {
         Appel_enregistré: {
@@ -172,52 +178,54 @@ const contractSchema = mongoose.Schema(
       },
       qualification: {
         type: String,
-        enum: ['conforme', 'non-conforme', 'sav', 'annulation', 'aucun(e)',   "pas d'enregistrement",],
-        default: 'aucun(e)',
+        enum: [
+          "conforme",
+          "non-conforme",
+          "sav",
+          "annulation",
+          "aucun(e)",
+          "pas d'enregistrement",
+        ],
+        default: "aucun(e)",
       },
-      comment: { type: String, default: '' },
+      comment: { type: String, default: "" },
     },
     sav: {
       qualification: {
         type: String,
-        enum: ['validé', 'A_relancer', 'annulation', 'aucun(e)'],
-        default: 'aucun(e)',
+        enum: ["validé", "A_relancer", "annulation", "aucun(e)"],
+        default: "aucun(e)",
       },
-      comment: { type: String, default: '' },
+      comment: { type: String, default: "" },
     },
 
     wc: {
       qualification: {
         type: String,
         enum: [
+          "Validé",
+          "Répondeur",
+          "Appel raccrocher",
+          "A suivre",
+          "Refus de répondre",
+          "Rappel",
+          "Fiche blanche",
+          "Stop télémarketing",
+          "SAV",
+          "Faux numéro",
+          "Client toujours injoignable suite à un rappel planifié",
+          "annulation",
           "aucun(e)",
-  "Validé",
-  "Répondeur",
-  "Appel raccrocher",
-  "A suivre",
-  "Refus de répondre",
-  "Rappel",
-  "Fiche blanche",
-  "Stop télémarketing",
-  "SAV",
-  "Faux numéro",
-  "Client toujours injoignable suite à un rappel planifié",
-  "annulation",
         ],
-        default: 'aucun(e)',
-
+        default: "aucun(e)",
       },
       subQualification: {
         type: String,
-      
       },
-      comment: { type: String, default: '' },
-      
+      comment: { type: String, default: "" },
     },
-   
   },
 
-  
   { timestamps: true }
 );
-module.exports = mongoose.model('Contract', contractSchema);
+module.exports = mongoose.model("Contract", contractSchema);
