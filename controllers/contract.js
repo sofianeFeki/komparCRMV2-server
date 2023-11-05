@@ -495,7 +495,7 @@ exports.update = async (req, res) => {
 exports.exportData = async (req, res) => {
   const { filters } = req.body;
   const date = filters.date && filters.date.length > 0 ? filters.date[0] : null;
-  console.log(date);
+  console.log(req.body);
 
   try {
     let query = {};
@@ -513,16 +513,20 @@ exports.exportData = async (req, res) => {
       }
     }
 
-    if (filters.qualificationqté) {
-      query["quality.qualification"] = filters.qualificationqté;
+    if (filters.qualificationQté) {
+      query["quality.qualification"] = filters.qualificationQté;
     }
 
-    if (filters.qualificationwc) {
-      query["wc.qualification"] = filters.qualificationwc;
+    if (filters.qualificationWc) {
+      query["wc.qualification"] = filters.qualificationWc;
     }
 
     if (filters.partenaire) {
       query.Nom_du_partenaire = filters.partenaire;
+    }
+
+    if (filters.fournisseur) {
+      query.Fournisseur = filters.fournisseur;
     }
 
     let contracts;
