@@ -218,8 +218,6 @@ exports.savRows = async (req, res) => {
   const pageSize = 20;
 
   try {
-    console.log(page);
-
     let query = Contract.find();
 
     if (quickFilterValue) {
