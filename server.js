@@ -12,7 +12,7 @@ const app = express();
 //db
 mongoose.set('strictQuery', false);
 mongoose
-  .connect('mongodb+srv://sofienFeki:IPsZuLlngULq7FTO@komparcrm.a634yzc.mongodb.net/test', {
+  .connect('mongodb+srv://sofiene:20224267aa@komparcrm.bncygkp.mongodb.net/test', {
     useNewUrlParser: true,
   })
   .then(() => console.log('db-connected'))
