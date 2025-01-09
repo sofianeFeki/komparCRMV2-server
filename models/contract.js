@@ -194,7 +194,6 @@ const contractSchema = mongoose.Schema(
     sav: {
       qualification: {
         type: String,
-        enum: ['validé', 'A_relancer', 'annulation', 'aucun(e)'],
         default: 'aucun(e)',
       },
       comment: { type: String, default: '' },
